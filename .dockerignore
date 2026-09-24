@@ -1,0 +1,11 @@
+.env
+.git
+__pycache__/
+*.pyc
+.venv/
+venv/
+logs/
+*.db
+data/*.pdf
+eval/results.csv
+eval/summary.json

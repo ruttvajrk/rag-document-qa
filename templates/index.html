@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Archive · RAG Document Assistant</title>
+<style>
+  :root {
+    --ink: #12172B;
+    --ink-raised: #1B2140;
+    --paper: #EDEDE3;
+    --paper-dim: #A9AAB8;
+    --gold: #D6A756;
+    --gold-dim: #8A733E;
+    --line: #2B3260;
+    --error: #C1666B;
+    --mono: 'Courier New', Courier, monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: Georgia, 'Times New Roman', serif;
+    min-height: 100vh;
+  }
+
+  .shell {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  header {
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 20px;
+    margin-bottom: 32px;
+  }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin: 0 0 8px 0;
+  }
+
+  h1 {
+    font-size: 32px;
+    font-weight: 400;
+    margin: 0;
+    letter-spacing: 0.01em;
+  }
+
+  .sub {
+    color: var(--paper-dim);
+    font-size: 14px;
+    margin-top: 8px;
+    font-family: var(--mono);
+  }
+
+  section {
+    margin-bottom: 36px;
+  }
+
+  .panel-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    margin-bottom: 12px;
+  }
+
+  /* ---- Upload zone ---- */
+  .dropzone {
+    border: 1px dashed var(--line);
+    border-radius: 2px;
+    padding: 28px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background 0.2s ease;
+    background: var(--ink-raised);
+  }
+  .dropzone:hover, .dropzone.dragover {
+    border-color: var(--gold);
+    background: #202750;
+  }
+  .dropzone input { display: none; }
+  .dropzone p {
+    margin: 0;
+    color: var(--paper-dim);
+    font-size: 14px;
+  }
+  .dropzone .accent { color: var(--gold); }
+
+  #fileList {
+    margin-top: 14px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--paper-dim);
+  }
+  #fileList div { padding: 3px 0; }
+
+  button {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    background: var(--gold);
+    color: var(--ink);
+    border: none;
+    padding: 12px 20px;
+    cursor: pointer;
+    margin-top: 14px;
+    border-radius: 2px;
+    transition: background 0.15s ease;
+  }
+  button:hover:not(:disabled) { background: #E8BC6E; }
+  button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .status {
+    font-family: var(--mono);
+    font-size: 12px;
+    margin-top: 10px;
+    min-height: 16px;
+  }
+  .status.ok { color: #7FB88A; }
+  .status.err { color: var(--error); }
+  .status.pending { color: var(--paper-dim); }
+
+  /* ---- Chat ---- */
+  #chatLog {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+
+  .turn { border-left: 2px solid var(--line); padding-left: 16px; }
+  .turn.question .role {
+    color: var(--gold);
+  }
+  .turn.answer .role {
+    color: var(--paper-dim);
+  }
+  .role {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .content {
+    font-size: 16px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+  }
+
+  .sources {
+    margin-top: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .source-badge {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--paper-dim);
+    border: 1px solid var(--line);
+    padding: 4px 8px;
+    border-radius: 2px;
+  }
+  .source-badge b { color: var(--gold); font-weight: normal; }
+
+  form#askForm {
+    display: flex;
+    gap: 10px;
+    border-top: 1px solid var(--line);
+    padding-top: 20px;
+  }
+  input[type="text"] {
+    flex: 1;
+    background: var(--ink-raised);
+    border: 1px solid var(--line);
+    color: var(--paper);
+    padding: 12px 14px;
+    font-family: Georgia, serif;
+    font-size: 15px;
+    border-radius: 2px;
+  }
+  input[type="text"]:focus {
+    outline: none;
+    border-color: var(--gold);
+  }
+  form#askForm button { margin-top: 0; white-space: nowrap; }
+
+  .empty-state {
+    color: var(--paper-dim);
+    font-family: var(--mono);
+    font-size: 13px;
+    font-style: normal;
+    padding: 20px 0;
+  }
+
+  ::selection { background: var(--gold-dim); color: var(--paper); }
+</style>
+</head>
+<body>
+<div class="shell">
+  <header>
+    <p class="eyebrow">Retrieval-Augmented Generation</p>
+    <h1>The Archive</h1>
+    <p class="sub">Pinecone vector search &middot; sentence-transformers &middot; Llama via Groq</p>
+  </header>
+
+  <section id="uploadSection">
+    <div class="panel-label">01 &nbsp;Add documents</div>
+    <div class="dropzone" id="dropzone">
+      <input type="file" id="fileInput" accept="application/pdf" multiple>
+      <p><span class="accent">Click to choose</span> or drag PDF files here</p>
+    </div>
+    <div id="fileList"></div>
+    <button id="ingestBtn" disabled>Ingest into archive</button>
+    <div class="status" id="ingestStatus"></div>
+  </section>
+
+  <section>
+    <div class="panel-label">02 &nbsp;Ask the archive</div>
+    <div id="chatLog">
+      <div class="empty-state" id="emptyState">No questions asked yet. Ingest a document above, then ask something specific about its contents.</div>
+    </div>
+    <form id="askForm">
+      <input type="text" id="questionInput" placeholder="What does the document say about..." autocomplete="off">
+      <button type="submit" id="askBtn">Ask</button>
+    </form>
+  </section>
+</div>
+
+<script>
+  const dropzone = document.getElementById('dropzone');
+  const fileInput = document.getElementById('fileInput');
+  const fileListEl = document.getElementById('fileList');
+  const ingestBtn = document.getElementById('ingestBtn');
+  const ingestStatus = document.getElementById('ingestStatus');
+  const chatLog = document.getElementById('chatLog');
+  const emptyState = document.getElementById('emptyState');
+  const askForm = document.getElementById('askForm');
+  const questionInput = document.getElementById('questionInput');
+  const askBtn = document.getElementById('askBtn');
+
+  let selectedFiles = [];
+
+  dropzone.addEventListener('click', () => fileInput.click());
+  dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
+  dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+  dropzone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropzone.classList.remove('dragover');
+    handleFiles(e.dataTransfer.files);
+  });
+  fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
+
+  function handleFiles(fileListObj) {
+    selectedFiles = Array.from(fileListObj).filter(f => f.name.toLowerCase().endsWith('.pdf'));
+    fileListEl.innerHTML = selectedFiles.map(f => `<div>${f.name}</div>`).join('');
+    ingestBtn.disabled = selectedFiles.length === 0;
+  }
+
+  ingestBtn.addEventListener('click', async () => {
+    if (selectedFiles.length === 0) return;
+    ingestBtn.disabled = true;
+    ingestStatus.className = 'status pending';
+    ingestStatus.textContent = 'Reading, chunking, and embedding document(s)... this can take a minute.';
+
+    const formData = new FormData();
+    selectedFiles.forEach(f => formData.append('files', f));
+
+    try {
+      const res = await fetch('/api/ingest', { method: 'POST', body: formData });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || 'Ingestion failed');
+      ingestStatus.className = 'status ok';
+      ingestStatus.textContent = `Indexed ${data.chunks_indexed} chunk(s) from ${data.files.join(', ')}.`;
+    } catch (err) {
+      ingestStatus.className = 'status err';
+      ingestStatus.textContent = 'Error: ' + err.message;
+    } finally {
+      ingestBtn.disabled = false;
+    }
+  });
+
+  askForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const question = questionInput.value.trim();
+    if (!question) return;
+
+    if (emptyState) emptyState.remove();
+
+    addTurn('question', question);
+    questionInput.value = '';
+    askBtn.disabled = true;
+
+    const pendingId = addTurn('answer', 'Thinking...');
+
+    try {
+      const res = await fetch('/api/ask', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || 'Request failed');
+
+      updateAnswer(pendingId, data.answer, data.sources, data.timing_ms);
+    } catch (err) {
+      updateAnswer(pendingId, 'Error: ' + err.message, []);
+    } finally {
+      askBtn.disabled = false;
+    }
+  });
+
+  let turnCounter = 0;
+  function addTurn(role, text) {
+    const id = 'turn-' + (turnCounter++);
+    const div = document.createElement('div');
+    div.className = 'turn ' + role;
+    div.id = id;
+    div.innerHTML = `<div class="role">${role === 'question' ? 'You asked' : 'Archive answers'}</div><div class="content">${escapeHtml(text)}</div>`;
+    chatLog.appendChild(div);
+    window.scrollTo(0, document.body.scrollHeight);
+    return id;
+  }
+
+  function updateAnswer(id, text, sources, timing) {
+    const el = document.getElementById(id);
+    const contentEl = el.querySelector('.content');
+    contentEl.textContent = text;
+
+    if (sources && sources.length > 0) {
+      const sourcesDiv = document.createElement('div');
+      sourcesDiv.className = 'sources';
+      sourcesDiv.innerHTML = sources.map(s =>
+        `<span class="source-badge"><b>${escapeHtml(s.source)}</b> p.${s.page} &middot; ${(s.score * 100).toFixed(0)}%</span>`
+      ).join('');
+      el.appendChild(sourcesDiv);
+    }
+    if (timing) {
+      const t = document.createElement('div');
+      t.className = 'sources';
+      t.textContent = `Answered in ${(timing.total / 1000).toFixed(2)} s (retrieval ${timing.retrieval} ms, generation ${timing.generation} ms)`;
+      el.appendChild(t);
+    }
+    window.scrollTo(0, document.body.scrollHeight);
+  }
+
+  // Hide the upload box when the server has uploads turned off (public demo mode)
+  fetch('/api/config').then(r => r.json()).then(cfg => {
+    if (!cfg.allow_uploads) {
+      document.getElementById('uploadSection').style.display = 'none';
+      const es = document.getElementById('emptyState');
+      if (es) es.textContent = 'Demo mode: sample documents are already loaded. Ask a question about them below.';
+    }
+  }).catch(() => {});
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+</script>
+</body>
+</html>

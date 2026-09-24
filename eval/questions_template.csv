@@ -1,0 +1,3 @@
+question,type,expected_source,expected_page
+"Replace this with a question whose answer is on a page you know",in_doc,your_file.pdf,3
+"Replace this with a question that is NOT covered by your PDFs",out_of_doc,,
