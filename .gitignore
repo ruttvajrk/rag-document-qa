@@ -11,8 +11,7 @@ venv/
 data/*.pdf
 logs/
 *.db
-eval/results.csv
-eval/summary.json
+
 
 # OS / editor
 .DS_Store

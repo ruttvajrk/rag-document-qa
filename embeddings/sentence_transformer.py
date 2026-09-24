@@ -28,4 +28,5 @@ class SentenceTransformerEmbedder:
 
     @property
     def dimension(self) -> int:
-        return self.model.get_sentence_embedding_dimension()
+        get_dim = getattr(self.model, "get_embedding_dimension", None) or self.model.get_sentence_embedding_dimension
+        return get_dim()

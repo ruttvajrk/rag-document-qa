@@ -3,7 +3,7 @@
 Ask questions about your PDF documents and get answers grounded in their content, with the source file and page cited for every answer.
 
 **Live demo:** _add link after deployment_  
-**Stack:** Python · FastAPI · Pinecone · Sentence Transformers · Groq API (Llama 3.3 70B) · SQLite · Docker
+**Stack:** Python · FastAPI · Pinecone · Sentence Transformers · Groq API (GPT-OSS 120B) · SQLite · Docker
 
 ![Screenshot](docs/screenshot.png) <!-- add a screenshot to docs/ -->
 
@@ -25,7 +25,7 @@ Recursive chunking (500 chars, 50 overlap)       Pinecone similarity search (cos
 Embeddings (all-MiniLM-L6-v2, 384-dim)           Prompt = retrieved chunks + question
    │                                                 │
    ▼                                                 ▼
-Pinecone serverless index  ◄──────────────────   Llama 3.3 70B via Groq API
+Pinecone serverless index  ◄──────────────────   GPT-OSS 120B via Groq API
 (text + file + page as metadata)                     │
                                                      ▼
                                          Grounded answer + [Source N] citations
@@ -133,12 +133,18 @@ _Add 2–3 real questions and the answers your app gave, with the PDF you used._
 python eval/evaluate.py --url http://localhost:8000 --questions eval/questions.csv
 ```
 
+Test set: 25 hand-written questions on 2 public PDFs (an HR grievance policy and an RTI FAQ; 19 pages, 88 chunks) — 20 answerable from the documents, 5 not.
+
 | Metric | Result |
 |---|---|
-| Documents / pages / chunks indexed | _fill in_ |
-| Retrieval hit rate (expected page in top-4) | _fill in_ |
-| Correct refusals on out-of-document questions | _fill in_ |
-| Average response time | _fill in_ (machine: _fill in_) |
+| Retrieval hit rate (expected page in top-4) | 19/20 |
+| Answers fully correct (manually checked) | 17/20 |
+| Correct refusals on out-of-document questions | 5/5 |
+| Median / average response time | 1.16 s / 1.81 s (retrieval 0.57 s + generation 1.25 s), measured on _your processor_ |
+
+**Errors found:** the model once misread an exclusion list (answered that promotions are covered when the policy excludes them), and once retrieval returned a general rule instead of a specific exception on another page. One answer was incomplete.
+
+**Model change:** Groq retired `llama-3.3-70b-versatile` in August 2026; the app now uses `openai/gpt-oss-120b`, set via `GROQ_MODEL` in `.env`.
 
 ## Query log (SQL)
 

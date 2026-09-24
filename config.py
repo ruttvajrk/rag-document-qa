@@ -36,7 +36,7 @@ class Config:
 
     # ---------------- Generation (Groq) ----------------
     GROQ_API_KEY: str = os.getenv("GROQ_API_KEY", "")
-    GROQ_MODEL: str = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
+    GROQ_MODEL: str = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
 
     # ---------------- Data ----------------
     DATA_DIR: str = os.getenv("DATA_DIR", "./data")

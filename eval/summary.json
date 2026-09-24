@@ -1,0 +1,9 @@
+{
+  "questions_tested": 25,
+  "retrieval_hit_rate": "19/20",
+  "correct_refusals": "5/5",
+  "avg_total_ms": 1811.1,
+  "median_total_ms": 1160.5,
+  "avg_retrieval_ms": 565.8,
+  "avg_generation_ms": 1245.3
+}

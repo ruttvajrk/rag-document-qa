@@ -1,0 +1,28 @@
+question,type,expected_source,expected_page
+
+
+"Which category of employees is covered by the grievance management policy?",in_doc,grievance_policy.pdf,2
+"Before a salary calculation error can be raised on SPEAK UP, what must the employee have done first?",in_doc,grievance_policy.pdf,3
+"Are complaints about promotions or medical insurance handled through this grievance system?",in_doc,grievance_policy.pdf,4
+"Who takes the final decision if a grievance is raised against a BU HR Head who is also a GRC member?",in_doc,grievance_policy.pdf,4
+"Which person is the only one given access to the Oracle grievance tool?",in_doc,grievance_policy.pdf,5
+"At least how many on-roll employees must an establishment have to set up a Grievance Redressal Committee?",in_doc,grievance_policy.pdf,6
+"What is the upper limit on the number of nominated members in a BU grievance committee?",in_doc,grievance_policy.pdf,7
+"For how long does the chairman of the GRC serve?",in_doc,grievance_policy.pdf,7
+"For which types of grievances can the reporting manager be involved in the investigation?",in_doc,grievance_policy.pdf,9
+"Is the appellate authority allowed to start a new investigation on its own?",in_doc,grievance_policy.pdf,12
+"How can an employee add supporting documents while raising a grievance on the portal?",in_doc,grievance_policy.pdf,14
+"What does the investigator do in the third stage of the grievance process?",in_doc,grievance_policy.pdf,15
+"Will the identity of an employee who raises a genuine complaint be kept secret?",in_doc,grievance_policy.pdf,2
+"What fee must be paid to request information from a central government public authority?",in_doc,rti_faq_2012.pdf,2
+"Does an applicant from a below-poverty-line family have to pay the RTI fee?",in_doc,rti_faq_2012.pdf,2
+"How quickly must information be provided if it concerns a person's life or liberty?",in_doc,rti_faq_2012.pdf,3
+"Within how many days can a second appeal be filed with the Central Information Commission?",in_doc,rti_faq_2012.pdf,3
+"Is an Assistant Public Information Officer responsible for supplying the requested information?",in_doc,rti_faq_2012.pdf,1
+"In which languages can an RTI application be written?",in_doc,rti_faq_2012.pdf,4
+"Are intelligence and security agencies required to share information under the RTI Act?",in_doc,rti_faq_2012.pdf,4
+"How many days of maternity leave do Adani employees get?",out_of_doc,,
+"What notice period must an employee serve before resigning?",out_of_doc,,
+"What penalty can be imposed on a Public Information Officer for delaying information?",out_of_doc,,
+"What is the capital of Australia?",out_of_doc,,
+"Who won the 2011 Cricket World Cup?",out_of_doc,,
